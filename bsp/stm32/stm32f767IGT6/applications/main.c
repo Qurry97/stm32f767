@@ -8,17 +8,14 @@
  * 2018-11-06     SummerGift   first version
  */
 
-#include <rtthread.h>
-#include <rtdevice.h>
-#include <board.h>
+
+
+#include "qx_rtt.h"
 
 int main(void)
 {
-    int count = 1;
-    while (count++)
-    {
-        // rt_pin_write(LED0_PIN, !rt_pin_read(LED0_PIN));
-        rt_thread_mdelay(500);
-    }
-    return RT_EOK;
+	//uart_tx_thread_init();
+	esp8266_test_thread_init();
+	key_thread_init();
+
 }

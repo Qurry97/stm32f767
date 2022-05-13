@@ -179,13 +179,10 @@ RT_WEAK void rt_hw_board_init()
 
     /* Pin driver initialization is open by default */
 #ifdef RT_USING_PIN
-    rt_hw_pin_init();
+    //rt_hw_pin_init();
 #endif
 
     /* USART driver initialization is open by default */
-#ifdef RT_USING_SERIAL
-    rt_hw_usart_init();
-#endif
 
     /* Set the shell console output device */
 #if defined(RT_USING_CONSOLE) && defined(RT_USING_DEVICE)
