@@ -17,31 +17,30 @@ TIM_HandleTypeDef TIM2_Handler;
 TIM_HandleTypeDef TIM5_Handler; 
 
 
-//arr us中断触发一次
-void TIM2_Init(uint16_t arr)
+// us中断触发一次
+void TIM2_Init(void)
 {
 	TIM2_Handler.Instance=TIM2;                         
-    TIM2_Handler.Init.Prescaler=10800;                    
+    TIM2_Handler.Init.Prescaler=108;                    
     TIM2_Handler.Init.CounterMode=TIM_COUNTERMODE_UP;    
-    TIM2_Handler.Init.Period=arr;                       
+    //TIM2_Handler.Init.Period=arr;                       
     TIM2_Handler.Init.ClockDivision=TIM_CLOCKDIVISION_DIV1;
     HAL_TIM_Base_Init(&TIM2_Handler);						 
 }
 
-void TIM5_Init(uint16_t arr)
+void TIM5_Init(void)
 {
 	TIM5_Handler.Instance=TIM5;                         
     TIM5_Handler.Init.Prescaler=108;                    
     TIM5_Handler.Init.CounterMode=TIM_COUNTERMODE_UP;    
-    TIM5_Handler.Init.Period=arr;                       
+    //TIM5_Handler.Init.Period=arr;                       
     TIM5_Handler.Init.ClockDivision=TIM_CLOCKDIVISION_DIV1;
     HAL_TIM_Base_Init(&TIM5_Handler);						 
 }
 
 void TIM_Start(TIM_HandleTypeDef *htim , uint16_t arr)
 {
-    //printf("tick = %ld\r\n",rt_tick_get());
-    __HAL_TIM_SET_AUTORELOAD(htim , arr);
+    __HAL_TIM_SET_AUTORELOAD(htim , arr);  //动态设置定时器重加载值
     HAL_TIM_Base_Start_IT(htim);
 }
 

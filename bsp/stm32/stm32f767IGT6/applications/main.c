@@ -14,16 +14,8 @@
 
 int main(void)
 {
-    uart1_init(115200);
-    TIM2_Init(104);
-    Auart_Init(9600);
-	rt_thread_delay(500);
-	Auart_Send_Data("Hello World.\r\n");
-    while(1){
-        //Auart_Send_Data("Hello World.\r\n");
-		printf("111\r\n");
-        rt_thread_delay(3000);
-    }
-
+    TIM2_Init();
+    TIM5_Init();
+    auart_thread_init();
 
 }

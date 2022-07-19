@@ -14,6 +14,8 @@
 #include "Drivers/HARDWARE/TIMER/timer.h"
 #include "Drivers/HARDWARE/AUART/auart.h"
 
+int auart_thread_init(void);
+
 
 
 #endif

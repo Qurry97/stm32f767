@@ -8,7 +8,8 @@
 
 /**********************************************
  * PE2:TX
- * PE3:RX
+ * PE3:RX   下降沿触发
+ * 数据结构 ： 1起始位 + 8数据位 + 1停止位 + 空闲位 （无校验位）
  * ********************************************/
 
 AUART_TX  auart_tx;
@@ -80,6 +81,12 @@ uint8_t Auart_Tx_Data_Read_Bit(uint16_t Cur , uint8_t Bit)
     return temp;
 }
 
+/***  接收数据当前字节的位值处理  ***/
+void Auart_Rx_Data_Bit(uint16_t Cur , uint8_t Bit ,uint8_t Bit_Data)
+{
+    auart_rx.rx_data_buffer[Cur] |= (Bit_Data << Bit);
+}
+
 /***   auart发送开启   ***/
 void Auart_Send_Open(void)
 {
@@ -114,17 +121,16 @@ void Auart_Send_Idle(void)
 /***   auart发送数据   ***/
 void Auart_Send_Data(uint8_t *str)
 {
-
-    //auart_tx.tx_data_len = sizeof(str);
     auart_tx.data_cur = 0;
     auart_tx.cur_bit  = 0;
+    auart_tx.start_flag = 0;
     memset(&auart_tx.tx_data_buffer , 0 , sizeof(auart_tx.tx_data_buffer));
 	for(int i = 0 ; *str!='\0' ; i++){
         auart_tx.tx_data_buffer[i] = *str;
         str++ ;
         auart_tx.tx_data_len++ ;
     }
-	printf("%s,%d\r\n",auart_tx.tx_data_buffer,auart_tx.tx_data_len);
+	DEBUG("%s,%d\r\n",auart_tx.tx_data_buffer,auart_tx.tx_data_len);
     Auart_Send_Open();
 }
 
@@ -132,10 +138,13 @@ void Auart_Send_Data(uint8_t *str)
 void Auart_Send_Data_Handler(void)
 {
     if(auart_tx.data_cur < auart_tx.tx_data_len){
-        if(auart_tx.cur_bit == 0){
+
+        if(auart_tx.start_flag == 0){
             Auart_Send_Start();
+            auart_tx.start_flag = 1;
             return ;
         }
+
         if(auart_tx.cur_bit < 8){
             if(Auart_Tx_Data_Read_Bit(auart_tx.data_cur , auart_tx.cur_bit) == 0){
 				TX_IO_Write(GPIO_LOW);
@@ -148,6 +157,7 @@ void Auart_Send_Data_Handler(void)
         else{
             auart_tx.cur_bit = 0;
             auart_tx.data_cur++;
+            auart_tx.start_flag = 0;
             Auart_Send_Stop();
         }
     }
@@ -156,10 +166,50 @@ void Auart_Send_Data_Handler(void)
     }
 }
 
+/***   GPIOE_3外部中断处理函数   ***/
+void EXTI3_IRQHandler(void)
+{
+    if(auart_rx.rx_state == AUART_RX_IDLE){
+        memset(&auart_rx , 0 , sizeof(auart_rx));
+        auart_rx.rx_state == AUART_RX_READ;
+        TIM_Start(&TIM5_Handler , auart_tx.one_bit_time / 2);  //开启接收定时器5
+    }
+}
+
 /***   auart数据接收处理函数   ***/
 void Auart_Read_Data_Handler(void)
 {
-    
+    if(__HAL_TIM_GET_AUTORELOAD(&TIM5_Handler) == auart_tx.one_bit_time){
+        __HAL_TIM_SET_AUTORELOAD(&TIM5_Handler , auart_tx.one_bit_time);
+    }
+
+    if((RX_IO_Read == GPIO_LOW) && (auart_rx.start_flag == 0)){
+        auart_rx.start_flag = 1;   //起始位
+        return ;
+    }
+    if(auart_rx.start_flag){
+        if(auart_rx.cur_bit < 8){
+            Auart_Rx_Data_Bit(auart_rx.data_cur , auart_rx.cur_bit++ ,(uint8_t)RX_IO_Read);
+        }
+        else{
+            if(auart_rx.data_cur == (RX_DATA_MAX - 1)){    //接收数据满
+                auart_rx.start_flag = 0;   //停止位
+                auart_rx.rx_state = AUART_RX_IDLE;
+                TIM_Stop(&TIM5_Handler);
+            }
+            else{
+                auart_rx.data_cur++;
+                auart_rx.start_flag = 0;                
+            }
+
+        }    
+    }
+    else{      //接收数据完成
+        auart_rx.start_flag = 0;
+        auart_rx.rx_state = AUART_RX_IDLE;
+        TIM_Stop(&TIM5_Handler);
+    }
+
 }
 
 
