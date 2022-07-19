@@ -52,7 +52,6 @@ typedef struct _AUART_RX_{
     uint16_t data_cur;                      //接受数据当前位置   
     RX_STATE rx_state;                      //接受状态
     uint8_t  cur_bit;                       //当前数据字节位
-    uint16_t data_cur;                      //当前数据位置
 }AUART_RX;
 
 

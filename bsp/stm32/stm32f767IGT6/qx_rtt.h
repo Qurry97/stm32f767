@@ -15,6 +15,7 @@
 #include "Drivers/HARDWARE/AUART/auart.h"
 
 int auart_thread_init(void);
+void uart1_init(uint32_t bound);
 
 
 

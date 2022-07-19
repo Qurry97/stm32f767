@@ -6,7 +6,7 @@
 
 #include "qx_rtt.h"
 
-static void key_thread(void *p)
+static void auart_thread(void *p)
 {
     uart1_init(115200);     //printf输出串口
 	Auart_Init(9600);

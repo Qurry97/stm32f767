@@ -171,7 +171,7 @@ void EXTI3_IRQHandler(void)
 {
     if(auart_rx.rx_state == AUART_RX_IDLE){
         memset(&auart_rx , 0 , sizeof(auart_rx));
-        auart_rx.rx_state == AUART_RX_READ;
+        auart_rx.rx_state = AUART_RX_READ;
         TIM_Start(&TIM5_Handler , auart_tx.one_bit_time / 2);  //开启接收定时器5
     }
 }
