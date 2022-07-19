@@ -14,9 +14,16 @@
 
 int main(void)
 {
-	//uart_tx_thread_init();
-	mqtt_thread_init();
-	//esp8266_test_thread_init();
-	key_thread_init();
+    uart1_init(115200);
+    TIM2_Init(104);
+    Auart_Init(9600);
+	rt_thread_delay(500);
+	Auart_Send_Data("Hello World.\r\n");
+    while(1){
+        //Auart_Send_Data("Hello World.\r\n");
+		printf("111\r\n");
+        rt_thread_delay(3000);
+    }
+
 
 }

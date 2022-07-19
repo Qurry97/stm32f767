@@ -3,9 +3,14 @@
 
 #include "qx_rtt.h"
 
+extern TIM_HandleTypeDef TIM2_Handler; 
+extern TIM_HandleTypeDef TIM5_Handler; 
 
-extern uint16_t USART3_RX_STA;
-void TIM7_Int_Init(uint16_t arr,uint16_t psc);
+void TIM2_Init(uint16_t arr);
+void TIM5_Init(uint16_t arr);
+void TIM_Start(TIM_HandleTypeDef *htim , uint16_t arr);
+void TIM_Stop(TIM_HandleTypeDef *htim);
+
 
 #endif
 
