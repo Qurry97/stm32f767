@@ -78,6 +78,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 	}
 }
 
+
 void USART1_IRQHandler(void)                	
 { 
 	uint8_t Res;

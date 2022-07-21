@@ -14,10 +14,11 @@
 #include "Drivers/HARDWARE/TIMER/timer.h"
 #include "Drivers/HARDWARE/AUART/auart.h"
 
-int auart_thread_init(void);
+int auart_tx_thread_init(void);
+int auart_rx_thread_init(void);
 void uart1_init(uint32_t bound);
 
-
+extern rt_sem_t auart_rx_sem;
 
 #endif
 

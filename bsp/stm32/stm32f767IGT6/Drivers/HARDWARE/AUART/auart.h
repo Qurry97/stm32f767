@@ -38,7 +38,7 @@ typedef enum _RX_STATE_{
 typedef struct _AUART_TX_{
     uint8_t  tx_data_buffer[TX_DATA_MAX];   //发送数据缓冲区
     uint8_t  cur_bit;                       //当前数据字节位
-    uint8_t  start_flag;                    //启动位标志位
+    volatile uint8_t  start_flag;           //启动位标志位
     TX_STATE tx_state;                      //发送状态
     uint32_t bound;                         //波特率
     uint16_t one_bit_time;                  //发送1bit时间
@@ -48,10 +48,11 @@ typedef struct _AUART_TX_{
 
 typedef struct _AUART_RX_{
     uint8_t  rx_data_buffer[RX_DATA_MAX];   //读取数据缓冲区
-    uint8_t  start_flag;                    //启动位标志位
-    uint16_t data_cur;                      //接受数据当前位置   
-    RX_STATE rx_state;                      //接受状态
-    uint8_t  cur_bit;                       //当前数据字节位
+    //volatile uint8_t  start_flag;         //启动位标志位
+    //volatile uint8_t  stop_flag;          //停止位标志位
+    volatile uint8_t  cur_bit;              //当前数据字节位
+    volatile uint16_t data_cur;             //接受数据当前位置   
+    RX_STATE rx_state;                      //接受状态   
 }AUART_RX;
 
 

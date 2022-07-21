@@ -16,6 +16,6 @@ int main(void)
 {
     TIM2_Init();
     TIM5_Init();
-    auart_thread_init();
-
+    auart_tx_thread_init();
+    auart_rx_thread_init();
 }

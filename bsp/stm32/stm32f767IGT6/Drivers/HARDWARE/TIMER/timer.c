@@ -31,7 +31,7 @@ void TIM2_Init(void)
 void TIM5_Init(void)
 {
 	TIM5_Handler.Instance=TIM5;                         
-    TIM5_Handler.Init.Prescaler=108;                    
+    TIM5_Handler.Init.Prescaler=10800;                    
     TIM5_Handler.Init.CounterMode=TIM_COUNTERMODE_UP;    
     //TIM5_Handler.Init.Period=arr;                       
     TIM5_Handler.Init.ClockDivision=TIM_CLOCKDIVISION_DIV1;
@@ -76,16 +76,20 @@ void TIM5_IRQHandler(void)
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-    //printf("tick = %ld\r\n",rt_tick_get());
-    //TIM_Stop(&TIM2_Handler);
     if(htim==(&TIM2_Handler)){
         if(auart_tx.tx_state == AUART_TX_SEND)
             Auart_Send_Data_Handler();
     }
 
     else if(htim==(&TIM5_Handler)){
-        if(auart_rx.rx_state == AUART_RX_READ)
-            Auart_Read_Data_Handler();
+		if(auart_rx.rx_state != AUART_RX_READ){
+			auart_rx.rx_state = AUART_RX_READ;
+			printf("11123\r\n");
+			return ;
+		}
+        if(auart_rx.rx_state == AUART_RX_READ){
+			Auart_Read_Data_Handler();
+		}
     }
 }
 
