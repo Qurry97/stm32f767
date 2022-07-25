@@ -1,4 +1,4 @@
-/***********************************************
+﻿/***********************************************
  * Autor :Qurry
  * Time  :2022/7/14
  * Fuction :IO模拟串口功能实现
@@ -85,7 +85,6 @@ uint8_t Auart_Tx_Data_Read_Bit(uint16_t Cur , uint8_t Bit)
 void Auart_Rx_Data_Bit(uint16_t Cur , uint8_t Bit ,uint8_t Bit_Data)
 {
     auart_rx.rx_data_buffer[Cur] |= (Bit_Data << (Bit-1));
-    DEBUG("bit=%d\r\n",Bit_Data);
 }
 
 /***   auart发送开启   ***/
@@ -132,7 +131,6 @@ void Auart_Send_Data(uint8_t *str)
         str++ ;
         auart_tx.tx_data_len++ ;
     }
-	DEBUG("tx_data:%s",auart_tx.tx_data_buffer);
     Auart_Send_Open();
 }
 
@@ -168,16 +166,23 @@ void Auart_Send_Data_Handler(void)
     }
 }
 
-/***   GPIOE_3外部中断处理函数   ***/
+
 void EXTI3_IRQHandler(void)
 {
-    //if(auart_rx.rx_state == AUART_RX_IDLE){
-    //        HAL_NVIC_DisableIRQ(EXTI3_IRQn);
-            memset(&auart_rx , 0 , sizeof(auart_rx));
-			DEBUG("EXTI3_IRQHandler\r\n");
-    //        TIM_Start(&TIM5_Handler , (auart_tx.one_bit_time));  //开启接收定时器5		
-    //}
+    HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
 }
+
+/***   GPIOE_3外部中断处理函数   ***/
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	if(auart_rx.rx_state == AUART_RX_IDLE){
+		HAL_NVIC_DisableIRQ(EXTI3_IRQn);
+		//memset(&auart_rx , 0 , sizeof(auart_rx));
+		TIM_Start(&TIM5_Handler , (auart_tx.one_bit_time /2));  //开启接收定时器5		
+	}
+}
+
 
 #if 0
 /***   auart数据接收处理函数   ***/
@@ -234,18 +239,16 @@ void Auart_Read_Data_Handler(void)
 
 void Auart_Read_Data_Handler(void)
 {
-    if(__HAL_TIM_GET_AUTORELOAD(&TIM5_Handler) != auart_tx.one_bit_time){
-        __HAL_TIM_SET_AUTORELOAD(&TIM5_Handler , auart_tx.one_bit_time);
-        DEBUG("SET_AUTORELOAD.\r\n");
-    }
+	if(__HAL_TIM_GET_AUTORELOAD(&TIM5_Handler) != auart_tx.one_bit_time){
+		__HAL_TIM_SET_AUTORELOAD(&TIM5_Handler , auart_tx.one_bit_time);
+	}
 
     switch (auart_rx.cur_bit){
         case 0:
             if(RX_IO_Read != GPIO_LOW){
-                auart_rx.rx_state = AUART_RX_IDLE;
                 TIM_Stop(&TIM5_Handler);
 				rt_sem_release(auart_rx_sem);
-				DEBUG("RX Start fail!\r\n");
+				//auart_rx.rx_state = AUART_RX_IDLE;
                 HAL_NVIC_EnableIRQ(EXTI3_IRQn);
                 
                 break;
@@ -258,9 +261,9 @@ void Auart_Read_Data_Handler(void)
                 auart_rx.data_cur++;
             }
             else{
-                auart_rx.rx_state = AUART_RX_IDLE;
                 TIM_Stop(&TIM5_Handler);
 				rt_sem_release(auart_rx_sem);
+				//auart_rx.rx_state = AUART_RX_IDLE;
                 HAL_NVIC_EnableIRQ(EXTI3_IRQn);
             }
             auart_rx.cur_bit = 0;
@@ -268,7 +271,7 @@ void Auart_Read_Data_Handler(void)
 
         default:
             Auart_Rx_Data_Bit(auart_rx.data_cur , auart_rx.cur_bit ,(uint8_t)RX_IO_Read);
-            auart_rx.data_cur++;
+            auart_rx.cur_bit++;
             break;
     }
 

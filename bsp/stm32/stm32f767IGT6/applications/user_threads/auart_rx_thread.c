@@ -1,4 +1,4 @@
-/************************************************************
+﻿/************************************************************
     Author:  Qurry
     Time:    2022/7/19
     Fution:  Stm32f7 Auart RX (IO模拟串口)逻辑处理线程   
@@ -21,8 +21,11 @@ static void auart_rx_thread(void *p)
 			rt_thread_mdelay(10);
             continue;
         }
-        DEBUG("auart_rx_thread.\r\n");
-        Auart_Send_Data(auart_rx.rx_data_buffer);           
+        Auart_Send_Data(auart_rx.rx_data_buffer); 
+		printf("rx:%s ,%d\r\n",auart_rx.rx_data_buffer,RX_IO_Read);
+		
+		memset(&auart_rx , 0 , sizeof(auart_rx));
+		auart_rx.rx_state = AUART_RX_IDLE;
 	}
 }
 

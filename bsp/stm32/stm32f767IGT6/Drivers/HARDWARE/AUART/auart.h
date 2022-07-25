@@ -1,4 +1,4 @@
-#ifndef _AUART_H
+﻿#ifndef _AUART_H
 #define _AUART_H
 
 #include "qx_rtt.h"
@@ -48,8 +48,6 @@ typedef struct _AUART_TX_{
 
 typedef struct _AUART_RX_{
     uint8_t  rx_data_buffer[RX_DATA_MAX];   //读取数据缓冲区
-    //volatile uint8_t  start_flag;         //启动位标志位
-    //volatile uint8_t  stop_flag;          //停止位标志位
     volatile uint8_t  cur_bit;              //当前数据字节位
     volatile uint16_t data_cur;             //接受数据当前位置   
     RX_STATE rx_state;                      //接受状态   
