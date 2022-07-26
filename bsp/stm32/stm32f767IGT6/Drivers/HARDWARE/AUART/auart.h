@@ -11,7 +11,7 @@
     #define DEBUG
 #endif
 
-
+#define AUART_BOUND  9600
 
 #define TX_DATA_MAX   192
 #define RX_DATA_MAX   192

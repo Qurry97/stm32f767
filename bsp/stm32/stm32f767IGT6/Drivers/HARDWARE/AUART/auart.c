@@ -178,7 +178,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if(auart_rx.rx_state == AUART_RX_IDLE){
 		HAL_NVIC_DisableIRQ(EXTI3_IRQn);
-		TIM_Start(&TIM5_Handler , auart_tx.one_bit_time/2);  //开启接收定时器5		
+		TIM_Start(&TIM5_Handler , auart_tx.one_bit_time/2);  //开启接收定时器5	
 	}
 }
 

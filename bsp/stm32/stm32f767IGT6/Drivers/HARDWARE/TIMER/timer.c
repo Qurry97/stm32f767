@@ -91,7 +91,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			}
 			else{
 				TIM_Stop(&TIM5_Handler);
-				rt_sem_release(auart_rx_sem);
+				//rt_sem_release(auart_rx_sem);
 				HAL_NVIC_EnableIRQ(EXTI3_IRQn);
 			}
 		}

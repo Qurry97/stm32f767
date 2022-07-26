@@ -1,4 +1,4 @@
-/************************************************************
+﻿/************************************************************
     Author:  Qurry
     Time:    2022/7/19
     Fution:  Stm32f7 Auart TX (IO模拟串口)逻辑处理线程   
@@ -9,12 +9,11 @@
 static void auart_tx_thread(void *p)
 {
     uart1_init(19200);     //printf输出串口
-	Auart_Init(9600);
+	Auart_Init(AUART_BOUND);
 	while(1){
-       // Auart_Send_Data("Qurry hello");
-		//DEBUG("tx:%s\r\n",auart_tx.tx_data_buffer);
-        //DEBUG("auart_tx_thread\r\n");
-        rt_thread_mdelay(2000);
+		Auart_Send_Data("Qurry hello!");
+		DEBUG("auart_tx_thread :%s\r\n",auart_tx.tx_data_buffer);
+        rt_thread_mdelay(3000);
 	}
 }
 

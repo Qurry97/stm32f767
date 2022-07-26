@@ -1,4 +1,4 @@
-﻿/************************************************************
+/************************************************************
     Author:  Qurry
     Time:    2022/7/19
     Fution:  Stm32f7 Auart RX (IO模拟串口)逻辑处理线程   
@@ -9,6 +9,7 @@
 
 rt_sem_t auart_rx_sem = RT_NULL;
 
+/****   处理完接收数据后重新使能接收中断                   ***/
 void read_rx_data()
 {
 	DEBUG("rx:%s ,%d\r\n",auart_rx.rx_data_buffer,RX_IO_Read);
@@ -37,7 +38,7 @@ static void auart_rx_thread(void *p)
 int auart_rx_thread_init(void)
 {
 	rt_thread_t thread = RT_NULL;
-	thread = rt_thread_create("auart_rxthr", auart_rx_thread, RT_NULL, 10*1024, 5, 10); 
+	thread = rt_thread_create("auart_rxthr", auart_rx_thread, RT_NULL, 10*1024, 4, 10); 
     if(thread == RT_NULL)
     {
         return RT_ERROR;
