@@ -178,23 +178,15 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if(auart_rx.rx_state == AUART_RX_IDLE){
 		HAL_NVIC_DisableIRQ(EXTI3_IRQn);
-		TIM_Start(&TIM5_Handler , auart_tx.one_bit_time/2);  //开启接收定时器5	
+		TIM_Start(&TIM5_Handler , auart_tx.one_bit_time);  //开启接收定时器5	
 	}
 }
 
 
 
 /***   auart数据接收处理函数   ***/
-
-
-
-
 void Auart_Read_Data_Handler(void)
 {
-	if(__HAL_TIM_GET_AUTORELOAD(&TIM5_Handler) != auart_tx.one_bit_time){
-		__HAL_TIM_SET_AUTORELOAD(&TIM5_Handler , auart_tx.one_bit_time);
-	}
-
     switch (auart_rx.cur_bit){
         case 0:
             if(RX_IO_Read != GPIO_LOW){

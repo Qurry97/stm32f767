@@ -25,7 +25,8 @@ void TIM2_Init(void)
     TIM2_Handler.Init.CounterMode=TIM_COUNTERMODE_UP;    
     //TIM2_Handler.Init.Period=arr;                       
     TIM2_Handler.Init.ClockDivision=TIM_CLOCKDIVISION_DIV1;
-    HAL_TIM_Base_Init(&TIM2_Handler);						 
+    HAL_TIM_Base_Init(&TIM2_Handler);	
+	__HAL_TIM_ENABLE(&TIM2_Handler);
 }
 
 void TIM5_Init(void)
@@ -35,27 +36,29 @@ void TIM5_Init(void)
     TIM5_Handler.Init.CounterMode=TIM_COUNTERMODE_UP;    
     //TIM5_Handler.Init.Period=arr;                       
     TIM5_Handler.Init.ClockDivision=TIM_CLOCKDIVISION_DIV1;
-    HAL_TIM_Base_Init(&TIM5_Handler);						 
+    HAL_TIM_Base_Init(&TIM5_Handler);
+	__HAL_TIM_ENABLE(&TIM5_Handler);
 }
 
 
 void TIM_Start(TIM_HandleTypeDef *htim , uint16_t arr)
 {
     __HAL_TIM_SET_AUTORELOAD(htim , arr);  //动态设置定时器重加载值
-    HAL_TIM_Base_Start_IT(htim);
+    __HAL_TIM_SET_COUNTER(htim,0);         //重新计数
+    __HAL_TIM_ENABLE_IT(htim, TIM_IT_UPDATE);
 	
 }
 
 void TIM_Stop(TIM_HandleTypeDef *htim)
 {
-    HAL_TIM_Base_Stop_IT(htim);	
+    __HAL_TIM_DISABLE_IT(htim, TIM_IT_UPDATE);
 }
 
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
 {
     if(htim->Instance==TIM2){
 		__HAL_RCC_TIM2_CLK_ENABLE();            //使能TIM2时钟
-		HAL_NVIC_SetPriority(TIM2_IRQn,2,1);    //设置中断优先级，抢占优先级2，子优先级0
+		HAL_NVIC_SetPriority(TIM2_IRQn,2,1);    //设置中断优先级，抢占优先级2，子优先级1
 		HAL_NVIC_EnableIRQ(TIM2_IRQn);          //开启ITM2中断   
 	}
 
@@ -91,7 +94,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			}
 			else{
 				TIM_Stop(&TIM5_Handler);
-				//rt_sem_release(auart_rx_sem);
 				HAL_NVIC_EnableIRQ(EXTI3_IRQn);
 			}
 		}
