@@ -85,13 +85,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     }
 
     else if(htim==(&TIM5_Handler)){
-		if(auart_rx.rx_state != AUART_RX_READ){
-			if(RX_IO_Read == GPIO_LOW){
+		if(auart_rx.rx_state == AUART_RX_IDLE){
+			if(RX_IO_Read == GPIO_LOW){           //起始信号
 				auart_rx.rx_state = AUART_RX_READ;
-				//return ;
 			}
 			else{
 				TIM_Stop(&TIM5_Handler);
+				rt_sem_release(auart_rx_sem);
 				HAL_NVIC_EnableIRQ(EXTI3_IRQn);
 			}
 		}

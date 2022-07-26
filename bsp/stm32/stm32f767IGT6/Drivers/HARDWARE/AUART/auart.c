@@ -178,64 +178,16 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if(auart_rx.rx_state == AUART_RX_IDLE){
 		HAL_NVIC_DisableIRQ(EXTI3_IRQn);
-		//memset(&auart_rx , 0 , sizeof(auart_rx));
-		TIM_Start(&TIM5_Handler , (auart_tx.one_bit_time /2));  //开启接收定时器5		
+		TIM_Start(&TIM5_Handler , auart_tx.one_bit_time/2);  //开启接收定时器5		
 	}
 }
 
 
-#if 0
+
 /***   auart数据接收处理函数   ***/
-void Auart_Read_Data_Handler(void)
-{
-    if(__HAL_TIM_GET_AUTORELOAD(&TIM5_Handler) != auart_tx.one_bit_time){
-        __HAL_TIM_SET_AUTORELOAD(&TIM5_Handler , auart_tx.one_bit_time);
-        DEBUG("SET_AUTORELOAD.\r\n");
-    }
 
-    if((RX_IO_Read == GPIO_LOW) && (auart_rx.start_flag == 0)){
-        auart_rx.start_flag = 1;   //起始位
-        auart_rx.stop_flag = 0 ;
-        DEBUG("start_flag.\r\n");
-        return ;
-    }
-    if(auart_rx.start_flag){
-        if(auart_rx.cur_bit < 8){
-            Auart_Rx_Data_Bit(auart_rx.data_cur , auart_rx.cur_bit ,(uint8_t)RX_IO_Read);
-			auart_rx.cur_bit++;
-            return ;
-        }
-        else{
-            if(auart_rx.data_cur < RX_DATA_MAX){    //接收数据未满
-                auart_rx.data_cur++;
-                auart_rx.start_flag = 0;
-                auart_rx.stop_flag = 1; 
-				return ;
-            }
-            else{
-                auart_rx.start_flag = 0;   
-                auart_rx.stop_flag = 0 ;
-                auart_rx.rx_state = AUART_RX_IDLE;
-                TIM_Stop(&TIM5_Handler);
-                HAL_NVIC_EnableIRQ(EXTI3_IRQn);
-                DEBUG("tim stop1.\r\n");
-                return ;           
-            }
 
-        }    
-    }
-    if((auart_rx.start_flag == 0) && (auart_rx.stop_flag)){      //接收数据完成
-        auart_rx.stop_flag = 0;
-        auart_rx.rx_state = AUART_RX_IDLE;
-		rt_sem_release(auart_rx_sem);
-        TIM_Stop(&TIM5_Handler);
-        HAL_NVIC_EnableIRQ(EXTI3_IRQn);
-        DEBUG("tim stop2.\r\n");
-    }
 
-}
-
-#else
 
 void Auart_Read_Data_Handler(void)
 {
@@ -247,10 +199,7 @@ void Auart_Read_Data_Handler(void)
         case 0:
             if(RX_IO_Read != GPIO_LOW){
                 TIM_Stop(&TIM5_Handler);
-				rt_sem_release(auart_rx_sem);
-				//auart_rx.rx_state = AUART_RX_IDLE;
-                HAL_NVIC_EnableIRQ(EXTI3_IRQn);
-                
+				rt_sem_release(auart_rx_sem);               
                 break;
             }
             auart_rx.cur_bit++;
@@ -263,8 +212,6 @@ void Auart_Read_Data_Handler(void)
             else{
                 TIM_Stop(&TIM5_Handler);
 				rt_sem_release(auart_rx_sem);
-				//auart_rx.rx_state = AUART_RX_IDLE;
-                HAL_NVIC_EnableIRQ(EXTI3_IRQn);
             }
             auart_rx.cur_bit = 0;
             break;
@@ -277,4 +224,4 @@ void Auart_Read_Data_Handler(void)
 
 }
 
-#endif
+
